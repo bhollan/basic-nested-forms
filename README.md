@@ -34,8 +34,7 @@ How do we write our Person form? We don't want to require our user to first crea
 
 Previously, we wrote setters like `Song#artist_name=` to find or create an Artist and connect them to the song.
 
-That won't work here, because an address contains more than one field. In the `Artist` case we were just doing the `name`. With `Address` it's "structured data". All that really means is it has multiple fields attached to it. When we build a form
-for it, the form will send a different key for each field in each address. This can get a bit unwieldy so we generally try to group a hash within the params hash – makes things much neater. Spoiler: Rails has a way to send this across as a hash.
+That won't work here, because an address contains more than one field. In the `Artist` case we were just doing the `name`. With `Address` it's "structured data". All that really means is it has multiple fields attached to it. When we build a form for it, the form will send a different key for each field in each address. This can get a bit unwieldy so we generally try to group a hash within the params hash – makes things much neater. Spoiler: Rails has a way to send this across as a hash.
 
 The complete `params` object for creating a person will look like the following. Using "0" and "1" as keys can seem a bit odd, but it makes everything else work moving forward. This hash is now more versatile. You can use it like an array by just doing `params[:addresses_attributes][0.to_s]` or like a normal hash.
 
@@ -132,12 +131,9 @@ Load the page up and see the majestic beauty of what you and Rails have written 
 
 ## Creating stubs
 
-We're asking rails to generate `fields_for` each of the Person's addresses. But
-when we're first creating a Person, they have no addresses. Just like  `f.text_field :name` will have nothing in the text field if there is no name, `f.fields_for :addresses` will have no addresses fields if there are no addresses.
+We're asking rails to generate `fields_for` each of the Person's addresses. But when we're first creating a Person, they have no addresses. Just like  `f.text_field :name` will have nothing in the text field if there is no name, `f.fields_for :addresses` will have no addresses fields if there are no addresses.
 
-We'll take the most straightforward way out: when we create a Person in the
-PeopleController, we'll add two empty addresses to fill out. The final controller
-looks like this:
+We'll take the most straightforward way out: when we create a Person in the PeopleController, we'll add two empty addresses to fill out. The final controller looks like this:
 
 ```
 class PeopleController < ApplicationController
@@ -181,17 +177,11 @@ Now, refresh the page and you'll see two lovely address forms. Try and hit submi
 
 ## Avoiding duplicates
 
-One situation we can't use `accepts_nested_attributes_for` is when we want to
-avoid duplicates of the row we're creating.
+One situation we can't use `accepts_nested_attributes_for` is when we want to avoid duplicates of the row we're creating.
 
-In our address book app, perhaps it's reasonable to have duplicate address rows.
-Like, both Jerry and Tim live on 22 Elm Street, so there are two address rows
-for 22 Elm Street. That's fine for those purposes.
+In our address book app, perhaps it's reasonable to have duplicate address rows. Like, both Jerry and Tim live on 22 Elm Street, so there are two address rows for 22 Elm Street. That's fine for those purposes.
 
-But say we had a database of Songs and Artists. We would want Artist rows to be
-unique, so that `Artist.find_by(name: 'Tori Amos').songs` returns what we'd expect.
-If we want to be able to create Artists while creating Songs, we'll need to use
-`find_or_create_by` in our `artist_attributes=` method:
+But say we had a database of Songs and Artists. We would want Artist rows to be unique, so that `Artist.find_by(name: 'Tori Amos').songs` returns what we'd expect. If we want to be able to create Artists while creating Songs, we'll need to use `find_or_create_by` in our `artist_attributes=` method:
 
 ```ruby
 # app/models/song.rb
@@ -203,17 +193,9 @@ class Song < ActiveRecord::Base
 end
 ```
 
-This looks up existing Artists by name. If it doesn't exist, one is created.
-Then we update an artist's attributes with the ones we were given. We could choose
-to do something else, if we didn't want to allow bulk assigning of an artist's
-information through a song.
+This looks up existing Artists by name. If it doesn't exist, one is created. Then we update an artist's attributes with the ones we were given. We could choose to do something else, if we didn't want to allow bulk assigning of an artist's information through a song.
 
-Note that `accepts_nested_attributes_for` and setter methods (e.g.,
-`artist_attributes=`) aren't necessarily mutually exclusive. It's important to
-evaluate the needs of your specific use case and to choose the approach that
-makes the most sense. Keep in mind, too, that setter methods are useful for
-more than just avoiding duplicates — that's just one domain where they come in
-handy.
+Note that `accepts_nested_attributes_for` and setter methods (e.g., `artist_attributes=`) aren't necessarily mutually exclusive. It's important to evaluate the needs of your specific use case and to choose the approach that makes the most sense. Keep in mind, too, that setter methods are useful for more than just avoiding duplicates — that's just one domain where they come in handy.
 
 <p data-visibility='hidden'>View <a href='https://learn.co/lessons/basic-nested-forms' title='Basic Nested Forms'>Basic Nested Forms</a> on Learn.co and start learning to code for free.</p>
 
